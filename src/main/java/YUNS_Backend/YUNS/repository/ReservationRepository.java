@@ -16,6 +16,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.user JOIN FETCH r.notebook WHERE r.type = :type")
     List<Reservation> findAllByType(@Param("type") Type type);
 
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.user JOIN FETCH r.notebook")
+    List<Reservation> findAllWithDetails();
+
     @Query("SELECT r FROM Reservation r WHERE r.user.studentNumber = :studentNumber")
     Optional<Reservation> findByStudentNumber(@Param("studentNumber") String studentNumber);
 }
