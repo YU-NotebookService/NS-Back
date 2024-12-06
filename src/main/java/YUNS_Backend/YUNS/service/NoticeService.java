@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class NoticeService {
@@ -31,13 +33,18 @@ public class NoticeService {
         this.s3Service = s3Service;
     }
 
+    @Transactional
     public Page<NoticeDto> getAllNotices(Pageable pageable) {
-        Page<Notice> notices = noticeRepository.findAll(pageable);
-        // Lazy 로딩 문제를 방지하기 위해 모든 데이터를 명시적으로 초기화
-        notices.forEach(notice -> notice.getImages().size());
+        List<Notice> notices = noticeRepository.findAllWithImages(pageable);
 
-        return notices.map(this::convertToDto);
+        // DTO로 변환
+        List<NoticeDto> noticeDtos = notices.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(noticeDtos, pageable, noticeDtos.size());
     }
+
 
 
     public NoticeDto createNotice(NoticeDto noticeDto, List<MultipartFile> images, User user) {
