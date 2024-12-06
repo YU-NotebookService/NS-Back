@@ -15,5 +15,5 @@ public class NoticeDto {
     private String title;
     private String content;
     private LocalDateTime date;
-    private List<String> imageUrls;
+    private List<String> imageUrl;
 }
