@@ -70,7 +70,8 @@ public class NoticeService {
 
     @Transactional
     public NoticeDto updateNotice(Long id, NoticeDto noticeDto, List<MultipartFile> newImages, List<String> oldImageUrls) {
-        Optional<Notice> optionalNotice = noticeRepository.findById(id);
+        // Lazy 로딩 문제 방지를 위해 findNoticeWithImages 사용
+        Optional<Notice> optionalNotice = noticeRepository.findNoticeWithImages(id);
         if (optionalNotice.isEmpty()) {
             throw new EntityNotFoundException("Notice not found with id: " + id);
         }
@@ -85,7 +86,7 @@ public class NoticeService {
             }
         }
 
-        // 새 이미지 추가
+        // 새 이미지 업로드 및 추가
         List<String> newImageUrls = uploadImagesToS3(newImages);
         List<NoticeImage> newNoticeImages = newImageUrls.stream()
                 .map(url -> new NoticeImage(notice, url))
@@ -99,6 +100,7 @@ public class NoticeService {
         Notice savedNotice = noticeRepository.save(notice);
         return convertToDto(savedNotice);
     }
+
 
     @Transactional
     public void deleteNotice(Long id) {

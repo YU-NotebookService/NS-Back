@@ -51,9 +51,9 @@ public class NoticeController {
         return ResponseEntity.ok(createdNotice);
     }
 
-    @PutMapping("/api/admin/notices/{id}/update")
+    @PutMapping("/api/admin/notices/{noticeId}/update")
     public ResponseEntity<NoticeDto> updateNotice(
-            @PathVariable Long id,
+            @PathVariable Long noticeId,
             @RequestParam("title") String title,
             @RequestParam("content") String content,
             @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
@@ -64,9 +64,10 @@ public class NoticeController {
                 .content(content)
                 .build();
 
-        NoticeDto updatedNotice = noticeService.updateNotice(id, noticeDto, newImages, oldImageUrls);
+        NoticeDto updatedNotice = noticeService.updateNotice(noticeId, noticeDto, newImages, oldImageUrls);
         return updatedNotice != null ? ResponseEntity.ok(updatedNotice) : ResponseEntity.notFound().build();
     }
+
 
     @DeleteMapping("/api/admin/notices/{noticeId}/delete")
     public ResponseEntity<String> deleteNotice(@PathVariable Long noticeId) {
