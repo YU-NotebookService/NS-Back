@@ -37,24 +37,19 @@ public class NoticeController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetails currentUser) {
 
-        // 현재 로그인된 사용자 정보 가져오기
         User user = userService.findUserByStudentNumber(currentUser.getUsername());
         if (user == null) {
-            return ResponseEntity.badRequest().body(null); // 사용자 정보가 없으면 에러 반환
+            return ResponseEntity.badRequest().body(null);
         }
 
-        // NoticeDto 생성
         NoticeDto noticeDto = NoticeDto.builder()
                 .title(title)
                 .content(content)
                 .build();
 
-        // 공지사항 생성
         NoticeDto createdNotice = noticeService.createNotice(noticeDto, images, user);
         return ResponseEntity.ok(createdNotice);
     }
-
-
 
     @PutMapping("/api/admin/notices/{id}/update")
     public ResponseEntity<NoticeDto> updateNotice(
@@ -64,23 +59,14 @@ public class NoticeController {
             @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
             @RequestParam(value = "oldImageUrls", required = false) List<String> oldImageUrls) {
 
-        System.out.println("Updating Notice ID: " + id);
-        System.out.println("Title: " + title);
-        System.out.println("Content: " + content);
-        System.out.println("New Images: " + (newImages != null ? newImages.size() : "None"));
-        System.out.println("Old Image URLs: " + (oldImageUrls != null ? oldImageUrls.size() : "None"));
-
-        // DTO를 직접 생성
         NoticeDto noticeDto = NoticeDto.builder()
                 .title(title)
                 .content(content)
                 .build();
 
-        // Service 호출
         NoticeDto updatedNotice = noticeService.updateNotice(id, noticeDto, newImages, oldImageUrls);
         return updatedNotice != null ? ResponseEntity.ok(updatedNotice) : ResponseEntity.notFound().build();
     }
-
 
     @DeleteMapping("/api/admin/notices/{id}/delete")
     public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
@@ -98,7 +84,6 @@ public class NoticeController {
         Page<NoticeDto> noticeList = noticeService.getAllNotices(pageable);
         return ResponseEntity.ok(noticeList);
     }
-
 
     @GetMapping("/api/noticeList/{noticeId}")
     public ResponseEntity<NoticeDto> getNoticeById(@PathVariable Long noticeId) {
