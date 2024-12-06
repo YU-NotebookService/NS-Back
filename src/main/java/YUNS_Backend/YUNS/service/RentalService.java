@@ -1,6 +1,7 @@
 package YUNS_Backend.YUNS.service;
 
 import YUNS_Backend.YUNS.dto.RentalDto;
+import YUNS_Backend.YUNS.dto.ReservationDto;
 import YUNS_Backend.YUNS.entity.Notebook;
 import YUNS_Backend.YUNS.entity.Rental;
 import YUNS_Backend.YUNS.entity.RentalStatus;
@@ -25,6 +26,27 @@ public class RentalService {
     private final RentalRepository rentalRepository;
     private final ReservationRepository reservationRepository;
     private final NotebookRepository notebookRepository;
+
+    public ReservationDto.ReservationResponse getAllRentalRequests() {
+        List<Reservation> reservations = reservationRepository.findAllWithDetails(); // Lazy 로딩 문제 해결
+
+        List<ReservationDto.ReservationRequest> reservationRequests = reservations.stream()
+                .map(reservation -> ReservationDto.ReservationRequest.builder()
+                        .reservationId(reservation.getReservationId())
+                        .requestDate(reservation.getRequestDate().toString())
+                        .userId(reservation.getUser().getUserId())
+                        .name(reservation.getUser().getName())
+                        .studentNumber(reservation.getUser().getStudentNumber()) // 학번 추가
+                        .phoneNumber(reservation.getUser().getPhoneNumber())     // 연락처 추가
+                        .notebookId(reservation.getNotebook().getNotebookId())
+                        .notebookModel(reservation.getNotebook().getModel()) // 노트북 모델명 추가
+                        .build())
+                .collect(Collectors.toList());
+
+        return ReservationDto.ReservationResponse.builder()
+                .reservationRequests(reservationRequests)
+                .build();
+    }
 
     // 대여 요청 승인
     @Transactional
@@ -60,7 +82,7 @@ public class RentalService {
                     .user(rental.getUser())
                     .startDate(rental.getStartDate())
                     .endDate(rental.getEndDate().plusMonths(1))
-                    .rentalStatus(rental.getRentalStatus())
+                    .rentalStatus(RentalStatus.RENTAL)
                     .build();
 
             rentalRepository.save(updatedRental);

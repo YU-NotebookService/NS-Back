@@ -26,7 +26,7 @@ public class ExtendController {
 
     @GetMapping("/extend")
     public ResponseEntity<ReservationDto.ReservationResponse> getExtendRequests() {
-        List<Reservation> reservations = reservationRepository.findAll();
+        List<Reservation> reservations = reservationRepository.findAllWithDetails(); // Lazy 로딩 문제 해결
 
         List<ReservationDto.ReservationRequest> extendRequests = reservations.stream()
                 .filter(reservation -> reservation.getType() == Type.EXTEND)
@@ -35,7 +35,10 @@ public class ExtendController {
                         .requestDate(reservation.getRequestDate().toString())
                         .userId(reservation.getUser().getUserId())
                         .name(reservation.getUser().getName())
+                        .studentNumber(reservation.getUser().getStudentNumber())
+                        .phoneNumber(reservation.getUser().getPhoneNumber())
                         .notebookId(reservation.getNotebook().getNotebookId())
+                        .notebookModel(reservation.getNotebook().getModel())
                         .build())
                 .collect(Collectors.toList());
 

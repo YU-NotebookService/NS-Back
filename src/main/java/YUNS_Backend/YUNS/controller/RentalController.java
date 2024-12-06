@@ -29,21 +29,7 @@ public class RentalController {
 
     @GetMapping("/api/admin/request/rental")
     public ReservationDto.ReservationResponse getRentalRequests() {
-        List<Reservation> reservations = reservationRepository.findAll();  // 모든 대여 요청 조회
-
-        List<ReservationDto.ReservationRequest> reservationRequests = reservations.stream()
-                .map(reservation -> ReservationDto.ReservationRequest.builder()
-                        .reservationId(reservation.getReservationId())
-                        .requestDate(reservation.getRequestDate().toString())
-                        .userId(reservation.getUser().getUserId())
-                        .name(reservation.getUser().getName())
-                        .notebookId(reservation.getNotebook().getNotebookId())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ReservationDto.ReservationResponse.builder()
-                .reservationRequests(reservationRequests)
-                .build();
+        return rentalService.getAllRentalRequests(); // 서비스 계층으로 위임
     }
 
     @PostMapping("/api/admin/approve/{reservationId}")
