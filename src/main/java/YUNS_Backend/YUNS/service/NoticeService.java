@@ -100,17 +100,20 @@ public class NoticeService {
         return convertToDto(savedNotice);
     }
 
+    @Transactional
     public void deleteNotice(Long id) {
-        Optional<Notice> optionalNotice = noticeRepository.findById(id);
+        Optional<Notice> optionalNotice = noticeRepository.findNoticeWithImages(id);
         if (optionalNotice.isPresent()) {
             Notice notice = optionalNotice.get();
 
-            // S3에서 이미지 삭제
+            // 이미지 삭제
             notice.getImages().forEach(image -> s3Service.deleteFile(image.getImageUrl()));
 
+            // 엔티티 삭제
             noticeRepository.deleteById(id);
         }
     }
+
 
     @Transactional
     public Optional<NoticeDto> getNoticeById(Long id) {
@@ -143,7 +146,7 @@ public class NoticeService {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .date(notice.getDate())
-                .imageUrls(notice.getImages().stream()
+                .imageUrl(notice.getImages().stream()
                         .map(NoticeImage::getImageUrl)
                         .toList())
                 .build();

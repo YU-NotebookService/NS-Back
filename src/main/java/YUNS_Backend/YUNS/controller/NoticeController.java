@@ -68,9 +68,9 @@ public class NoticeController {
         return updatedNotice != null ? ResponseEntity.ok(updatedNotice) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/api/admin/notices/{id}/delete")
-    public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
-        noticeService.deleteNotice(id);
+    @DeleteMapping("/api/admin/notices/{noticeId}/delete")
+    public ResponseEntity<String> deleteNotice(@PathVariable Long noticeId) {
+        noticeService.deleteNotice(noticeId);
         return ResponseEntity.ok("공지사항이 삭제되었습니다.");
     }
 

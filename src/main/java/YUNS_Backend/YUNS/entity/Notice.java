@@ -90,7 +90,7 @@ public class Notice {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .date(notice.getDate())
-                .imageUrls(imageUrls) // URL 리스트 설정
+                .imageUrl(imageUrls) // URL 리스트 설정
                 .build();
     }
 }
